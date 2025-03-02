@@ -1,30 +1,21 @@
-import { useState } from "react";
 import { Card, Select } from "antd";
-import { useFormulaStore } from "@/hooks/useFormulaStore";
-import { evaluateFormula } from "@/utils/evaluateFormula";
-import { useAutocomplete } from "@/hooks";
+import { evaluateFormula } from "@/utils";
+import { useFormulaInput } from "@/hooks";
+
+const OPERATORS = ["+", "-", "*", "/", "^", "(", ")"];
 
 const FormulaInput = () => {
-  const { formula, setFormula } = useFormulaStore();
-  const [inputValue, setInputValue] = useState("");
-  const [open, setOpen] = useState(false);
-  const { data: suggestions = [], isLoading } = useAutocomplete(inputValue);
-
-  const handleSelect = (value: string) => {
-    setFormula([...formula, value]);
-    setInputValue("");
-    setOpen(false);
-  };
-
-  const handleChange = (values: string[]) => {
-    setFormula(values);
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") {
-      setOpen(false);
-    }
-  };
+  const {
+    open,
+    formula,
+    setOpen,
+    handleChange,
+    setInputValue,
+    handleKeyDown,
+    handleSelect,
+    suggestions,
+    isLoading,
+  } = useFormulaInput();
 
   return (
     <Card
@@ -33,7 +24,7 @@ const FormulaInput = () => {
       style={{ width: "100%", borderRadius: 8 }}
     >
       <Select
-        mode="multiple"
+        mode="tags"
         open={open}
         onDropdownVisibleChange={setOpen}
         value={formula}
@@ -47,18 +38,13 @@ const FormulaInput = () => {
         filterOption={false}
         placeholder="Enter formula..."
         style={{ width: "100%" }}
+        tokenSeparators={[" "]} 
         options={[
           ...suggestions.map((item) => ({
             value: item.name,
             label: item.name,
           })),
-          { value: "+", label: "+" },
-          { value: "-", label: "-" },
-          { value: "*", label: "*" },
-          { value: "/", label: "/" },
-          { value: "^", label: "^" },
-          { value: "(", label: "(" },
-          { value: ")", label: ")" },
+          ...OPERATORS.map((op) => ({ value: op, label: op })),
         ]}
         loading={isLoading}
       />

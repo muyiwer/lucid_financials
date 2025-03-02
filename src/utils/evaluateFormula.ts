@@ -8,13 +8,12 @@ export const evaluateFormula = (
     if (typeof item.value === "number") acc[item.name] = item.value;
     return acc;
   }, {} as Record<string, number>);
-
   const expression = formula
     .map((token) => (valuesMap[token] !== undefined ? valuesMap[token] : token))
     .join(" ");
 
   try {
-    return eval(expression);
+    return new Function(`return ${expression}`)();
   } catch {
     return "Invalid Formula";
   }
